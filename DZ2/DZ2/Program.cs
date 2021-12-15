@@ -6,21 +6,63 @@ using System.Threading.Tasks;
 
 namespace DZ2
 {
-    delegate string Event(Person person, bool move);
+    delegate void Event(Person person);
 
-    interface Sig
+    interface Need
     {
         void Create(string firstname, string lastname, string lastlastname, string status);
-        event Event Stunde;
-        event Event Out;
+        event Event Stunden;
+        event Event Outt;
     }
 
     class Person
     {
+        public event Event Stunden;
+        public event Event Outt;
+
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string LastLastName { get; set; }
         public string Status { get; set; }
+
+        bool stunde;
+        bool outt;
+
+        public bool Stunde
+        {
+            get
+            {
+                return stunde;
+            }
+
+            set
+            {
+                if(Stunden != null)
+                {
+                    Stunden(this);
+                }
+
+                stunde = value;
+            }
+        }
+
+        public bool Out
+        {
+            get
+            {
+                return outt;
+            }
+
+            set
+            {
+                if (Stunden != null)
+                {
+                    Outt(this);
+                }
+
+                outt = value;
+            }
+        }
 
 
         public Person(string firstname, string lastname, string lastlastname, string status)
@@ -31,7 +73,24 @@ namespace DZ2
             Status = status;
         }
 
+        public string x;
 
+        public string GetInfo(Person person)
+        {
+            string[] info = { person.FirstName, person.LastName, person.LastLastName, person.Status };
+
+            for (int i = 0; i < info.Length; i++)
+            {
+                x = x + info[i] + " ";
+            }
+
+            if (person.Status != "Преподаватель" && person.Status != "Кадровик" && person.Status.Contains("Группа") == false && person.Status != "Ассистент" && person.Status != "Старший преподаватель")
+            {
+                x = x + "Нет такой должности!";
+            }
+
+            return x;
+        }
 
 
 
@@ -61,46 +120,42 @@ namespace DZ2
                 LastLastName = lastlastname,
                 Status = status
             };
-        }
+        }       
 
-        public string x;
-
-        public string GetInfo(Person person)
-        {
-            string[] info = { person.FirstName, person.LastName, person.LastLastName, person.Status };
-
-            for (int i = 0; i < info.Length; i++)
-            {
-                x = x + info[i] + " ";
-            }
-
-            if (person.Status != "Преподаватель" && person.Status != "Группа")
-            {
-                x = x + "Нет такой должности!";
-            }
-
-            return x;
-        }
+        
     }
 
     class Program
     {
         static void Main(string[] args)
         {
-            //Lehrer lehrer = new Lehrer("Юрец", "Силёнок", "Викторович", "Преподаватель");
-            //Student student = new Student("Даниил", "Давыдов", "Александрович", "3-1П9");
-            Kadrowik kadrowik = new Kadrowik("Даниил", "Давыдов", "Александрович", "Кадровик");
-
-            //Console.WriteLine(lehrer.FirstName + " " + lehrer.LastName + " " + lehrer.LastLastName + " " + lehrer.Status);
-            //Console.WriteLine(student.FirstName + " " + student.LastName + " " + student.LastLastName + " " + student.Status);
+            Lehrer lehrer = new Lehrer("Юрец", "СилЕнок", "Викторович", "Преподаватель");
+            Student student = new Student("Даниил", "Давыдов", "Александрович", "3-1П9");
+            Kadrowik kadrowik = new Kadrowik("Даниил", "Давыдов", "Александрович", "Кадровик");            
 
             Person NewStudent = kadrowik.Create("А", "Б", "В", "Преподаватель");
             Person NewLehrer = kadrowik.Create("А", "Б", "В", "Преподаватель");
 
             Console.WriteLine(kadrowik.GetInfo(NewLehrer));
 
+            lehrer.Stunde = true;
+            student.Out = true;
+
+            lehrer.Stunden += Event1;
+            student.Outt += Event2;
+
             Console.ReadKey();
 
+        }
+
+        public static void Event1(Person person)
+        {
+            Console.WriteLine("Лекция проведена");
+        }
+
+        public static void Event2(Person person)
+        {
+            Console.WriteLine("Отчислился");
         }
     }
 }
