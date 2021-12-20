@@ -10,23 +10,57 @@ namespace DZ2
 
     interface INeed
     {
-        void Create(string lastname, string firstname, string lastlastname, string status);
+        void Create(string lastname, string firstname, string lastlastname);
         event Event Stunden;
         event Event Outt;
     }
 
-    class Person
+    abstract class Jober : Person
     {
+        public string Status { get; }
+
+        public Jober(string lastname, string firstname, string lastlastname, string status) : base (lastname, firstname, lastlastname)
+        {
+            Status = status;
+        }
+    }
+
+    public class Person
+    {
+        public string FirstName { get; }
+        public string LastName { get; }
+        public string LastLastName { get; }
+
+        public Person(string lastname, string firstname, string lastlastname)
+        {
+            FirstName = firstname;
+            LastName = lastname;
+            LastLastName = lastlastname;
+        }
+        public string x;
+
+        public string GetFIO(Person person)
+        {
+            string[] info = { person.LastName, person.FirstName, person.LastLastName};
+
+            for (int i = 0; i < info.Length; i++)
+            {
+                x = x + info[i] + " ";
+            }
+
+            return x;
+        }
+    }
+
+    class Lehrer : Jober
+    {
+        public Lehrer(string lastname, string firstname, string lastlastname, string status) : base(lastname, firstname, lastlastname, status)
+        {
+            Stunde = false;
+        }
+
         public event Event Stunden;
-        public event Event Outt;
-
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string LastLastName { get; set; }
-        public string Status { get; set; }
-
         public bool stunde;
-        public bool outt;
 
         public bool Stunde
         {
@@ -37,7 +71,7 @@ namespace DZ2
 
             set
             {
-                if(Stunden != null)
+                if (Stunden != null)
                 {
                     Stunden(this);
                 }
@@ -45,6 +79,19 @@ namespace DZ2
                 stunde = value;
             }
         }
+    }
+
+    class Student : Person
+    {
+        public Student(string lastname, string firstname, string lastlastname, string group) : base(lastname, firstname, lastlastname)
+        {
+            Group = group;
+            Out = false;
+        }
+
+        public string Group { get; }
+        public event Event Outt;
+        public bool outt;
 
         public bool Out
         {
@@ -63,62 +110,20 @@ namespace DZ2
                 outt = value;
             }
         }
-
-
-        public Person(string lastname, string firstname, string lastlastname, string status)
-        {
-            FirstName = firstname;
-            LastName = lastname;
-            LastLastName = lastlastname;
-            Status = status;
-        }     
-        
-        public string x;
-
-        public string GetInfo(Person person)
-        {
-            string[] info = { person.LastName, person.FirstName, person.LastLastName, person.Status };
-
-            for (int i = 0; i < info.Length; i++)
-            {
-                x = x + info[i] + " ";
-            }
-
-            if (person.Status != "Преподаватель" && person.Status != "Кадровик" && person.Status.Contains("Группа") == false && person.Status != "Ассистент" && person.Status != "Старший преподаватель")
-            {
-                x = x + "Нет такой должности!";
-            }
-
-            return x;
-        }
-
-
-
     }
 
-    class Lehrer : Person
-    {
-        public Lehrer(string lastname, string firstname, string lastlastname, string status) : base(lastname, firstname, lastlastname, status) { Stunde = false; }        
-    }
-
-    class Student : Person
-    {
-        public Student(string lastname, string firstname, string lastlastname, string status) : base(lastname, firstname, lastlastname, status) { Out = false; }        
-    }
-
-    class Kadrowik : Person
+    class Kadrowik : Jober
     {
         public Kadrowik(string lastname, string firstname, string lastlastname, string status) : base(lastname, firstname, lastlastname, status) { }
 
-        public Person Create(string lastname, string firstname, string lastlastname, string status)
+        public Lehrer CreateLehrer(string lastname, string firstname, string lastlastname, string status)
         {
-            return new Person(lastname, firstname, lastlastname, status)
-            {
-                FirstName = firstname,
-                LastName = lastname,
-                LastLastName = lastlastname,
-                Status = status
-            };
+            return new Lehrer(lastname, firstname, lastlastname, status) { };
+        }
+
+        public Student CreateStudent(string lastname, string firstname, string lastlastname, string group)
+        {
+            return new Student(lastname, firstname, lastlastname, group) { };
         }
     }
 
@@ -130,14 +135,16 @@ namespace DZ2
             Student student = new Student("Давыдов", "Даниил", "Александрович", "Группа: 3-1П9");
             Kadrowik kadrowik = new Kadrowik("Смирнова", "Нина", "Михайловна", "Кадровик");            
 
-            Person NewStudent = kadrowik.Create("Иванова", "Анна", "Сергеевна", "Ассистент");
-            Person NewLehrer = kadrowik.Create("Петров", "Михаил", "Валерьевич", "Группа: 2-1С9");
+            Person NewStudent = kadrowik.CreateLehrer("Иванова", "Анна", "Сергеевна", "Ассистент");
+            Person NewLehrer = kadrowik.CreateStudent("Петров", "Михаил", "Валерьевич", "Группа: 2-1С9");
 
-            Console.WriteLine(lehrer.GetInfo(lehrer));
-            Console.WriteLine(student.GetInfo(NewLehrer));
-            Console.WriteLine(kadrowik.GetInfo(kadrowik));
-            Console.WriteLine(NewStudent.GetInfo(NewStudent));
-            Console.WriteLine(NewLehrer.GetInfo(NewLehrer));                    
+            Console.WriteLine(lehrer.GetFIO(lehrer));
+            Console.WriteLine(student.GetFIO(NewLehrer));
+            Console.WriteLine(kadrowik.GetFIO(kadrowik));
+            Console.WriteLine(NewStudent.GetFIO(NewStudent));
+            Console.WriteLine(NewLehrer.GetFIO(NewLehrer));
+            Console.WriteLine(student.Group);
+            Console.WriteLine(lehrer.Status);
 
             lehrer.Stunden += Event1;
             student.Outt += Event2;
