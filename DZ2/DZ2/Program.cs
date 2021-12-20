@@ -8,9 +8,9 @@ namespace DZ2
 {
     delegate void Event(Person person);
 
-    interface Need
+    interface INeed
     {
-        void Create(string firstname, string lastname, string lastlastname, string status);
+        void Create(string lastname, string firstname, string lastlastname, string status);
         event Event Stunden;
         event Event Outt;
     }
@@ -25,8 +25,8 @@ namespace DZ2
         public string LastLastName { get; set; }
         public string Status { get; set; }
 
-        bool stunde;
-        bool outt;
+        public bool stunde;
+        public bool outt;
 
         public bool Stunde
         {
@@ -55,7 +55,7 @@ namespace DZ2
 
             set
             {
-                if (Stunden != null)
+                if (Outt != null)
                 {
                     Outt(this);
                 }
@@ -65,19 +65,19 @@ namespace DZ2
         }
 
 
-        public Person(string firstname, string lastname, string lastlastname, string status)
+        public Person(string lastname, string firstname, string lastlastname, string status)
         {
             FirstName = firstname;
             LastName = lastname;
             LastLastName = lastlastname;
             Status = status;
-        }
-
+        }     
+        
         public string x;
 
         public string GetInfo(Person person)
         {
-            string[] info = { person.FirstName, person.LastName, person.LastLastName, person.Status };
+            string[] info = { person.LastName, person.FirstName, person.LastLastName, person.Status };
 
             for (int i = 0; i < info.Length; i++)
             {
@@ -98,51 +98,52 @@ namespace DZ2
 
     class Lehrer : Person
     {
-        public Lehrer(string firstname, string lastname, string lastlastname, string status) : base(firstname, lastname, lastlastname, status) { }
+        public Lehrer(string lastname, string firstname, string lastlastname, string status) : base(lastname, firstname, lastlastname, status) { Stunde = false; }        
     }
 
     class Student : Person
     {
-        public Student(string firstname, string lastname, string lastlastname, string status) : base(firstname, lastname, lastlastname, status) { }
-
+        public Student(string lastname, string firstname, string lastlastname, string status) : base(lastname, firstname, lastlastname, status) { Out = false; }        
     }
 
     class Kadrowik : Person
     {
-        public Kadrowik(string firstname, string lastname, string lastlastname, string status) : base(firstname, lastname, lastlastname, status) { }
+        public Kadrowik(string lastname, string firstname, string lastlastname, string status) : base(lastname, firstname, lastlastname, status) { }
 
-        public Person Create(string firstname, string lastname, string lastlastname, string status)
+        public Person Create(string lastname, string firstname, string lastlastname, string status)
         {
-            return new Person(firstname, lastname, lastlastname, status)
+            return new Person(lastname, firstname, lastlastname, status)
             {
                 FirstName = firstname,
                 LastName = lastname,
                 LastLastName = lastlastname,
                 Status = status
             };
-        }       
-
-        
+        }
     }
 
     class Program
     {
         static void Main(string[] args)
         {
-            Lehrer lehrer = new Lehrer("Юрец", "СилЕнок", "Викторович", "Преподаватель");
-            Student student = new Student("Даниил", "Давыдов", "Александрович", "3-1П9");
-            Kadrowik kadrowik = new Kadrowik("Даниил", "Давыдов", "Александрович", "Кадровик");            
+            Lehrer lehrer = new Lehrer("Силенок", "Юрец", "Викторович", "Преподаватель");
+            Student student = new Student("Давыдов", "Даниил", "Александрович", "Группа: 3-1П9");
+            Kadrowik kadrowik = new Kadrowik("Смирнова", "Нина", "Михайловна", "Кадровик");            
 
-            Person NewStudent = kadrowik.Create("А", "Б", "В", "Преподаватель");
-            Person NewLehrer = kadrowik.Create("А", "Б", "В", "Преподаватель");
+            Person NewStudent = kadrowik.Create("Иванова", "Анна", "Сергеевна", "Ассистент");
+            Person NewLehrer = kadrowik.Create("Петров", "Михаил", "Валерьевич", "Группа: 2-1С9");
 
-            Console.WriteLine(kadrowik.GetInfo(NewLehrer));
-
-            lehrer.Stunde = true;
-            student.Out = true;
+            Console.WriteLine(lehrer.GetInfo(lehrer));
+            Console.WriteLine(student.GetInfo(NewLehrer));
+            Console.WriteLine(kadrowik.GetInfo(kadrowik));
+            Console.WriteLine(NewStudent.GetInfo(NewStudent));
+            Console.WriteLine(NewLehrer.GetInfo(NewLehrer));                    
 
             lehrer.Stunden += Event1;
             student.Outt += Event2;
+
+            lehrer.Stunde = true;
+            student.Out = true;
 
             Console.ReadKey();
 
@@ -150,7 +151,7 @@ namespace DZ2
 
         public static void Event1(Person person)
         {
-            Console.WriteLine("Лекция проведена");
+            Console.WriteLine("Провёл лекцию");
         }
 
         public static void Event2(Person person)
