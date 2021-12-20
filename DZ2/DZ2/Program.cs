@@ -52,9 +52,17 @@ namespace DZ2
         }
     }
 
+    public enum Rang
+    {
+        Assistent,
+        BigLehrer
+    }
+
     class Lehrer : Jober
     {
-        public Lehrer(string lastname, string firstname, string lastlastname, string status) : base(lastname, firstname, lastlastname, status)
+        static string[] dolj = { "Ассистент", "Старший преподаватель" };
+
+        public Lehrer(string lastname, string firstname, string lastlastname, Rang position) : base(lastname, firstname, lastlastname, dolj[(int)position])
         {
             Stunde = false;
         }
@@ -116,7 +124,7 @@ namespace DZ2
     {
         public Kadrowik(string lastname, string firstname, string lastlastname, string status) : base(lastname, firstname, lastlastname, status) { }
 
-        public Lehrer CreateLehrer(string lastname, string firstname, string lastlastname, string status)
+        public Lehrer CreateLehrer(string lastname, string firstname, string lastlastname, Rang status)
         {
             return new Lehrer(lastname, firstname, lastlastname, status) { };
         }
@@ -131,11 +139,11 @@ namespace DZ2
     {
         static void Main(string[] args)
         {
-            Lehrer lehrer = new Lehrer("Силенок", "Юрец", "Викторович", "Преподаватель");
+            Lehrer lehrer = new Lehrer("Силенок", "Юрец", "Викторович", Rang.BigLehrer);
             Student student = new Student("Давыдов", "Даниил", "Александрович", "Группа: 3-1П9");
             Kadrowik kadrowik = new Kadrowik("Смирнова", "Нина", "Михайловна", "Кадровик");            
 
-            Person NewStudent = kadrowik.CreateLehrer("Иванова", "Анна", "Сергеевна", "Ассистент");
+            Person NewStudent = kadrowik.CreateLehrer("Иванова", "Анна", "Сергеевна", Rang.Assistent);
             Person NewLehrer = kadrowik.CreateStudent("Петров", "Михаил", "Валерьевич", "Группа: 2-1С9");
 
             Console.WriteLine(lehrer.GetFIO(lehrer));
